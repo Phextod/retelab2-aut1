@@ -55,11 +55,10 @@ public class AdRepository {
     @Transactional
     @Modifying
     public void removeExpiredAds(){
-        try {
-            em.createQuery("DELETE FROM Ad a").executeUpdate();
-        } catch(Exception e){
-            System.out.println(e);
-        }
+        List<Ad> deletableElements = em.createQuery("SELECT a FROM Ad a WHERE a.expirationDate < :currentDate", Ad.class)
+                .setParameter("currentDate", LocalDateTime.now())
+                .getResultList();
+        deletableElements.forEach(x -> em.remove(x));
     }
 //    public Ad findById(long id) {
 //        return em.find(Ad.class, id);
